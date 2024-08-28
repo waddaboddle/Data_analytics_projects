@@ -1,0 +1,120 @@
+---
+title: "Analysis of Cyclistic's Casual Riders vs Annual Members"
+output: github_document
+---
+
+The objective of this analysis is to determine how do annual members and casual riders use Cyclistic bikes differently. This analysis will then be used to determine how to target and convert Casual Riders to Annual Members.
+
+The business task at hand is to how do annual members and casual riders use Cyclistic bikes differently?
+
+The stakeholders are Cyclistic, y. Lily Moreno: The director of mar, nels. ● Cyclistic marketing analy andhieve them. ● Cyclistic .keting program.
+
+
+The Data for this analysis is located under a private Jupyter Notebook server under Cyclistic-Capstone/Data
+The data is organized into 12 csv files each representing one of the 12 most recent months.
+?The data is reliable as it is provided by at trusted source (Divvy). The data is also original as the original data source is given by Divvy. The data is also current as it includes data from the prevoius 12 months. The data is also cited by Google ensuring its credibility. 
+
+The Agreement addresses licensing by granting a limited license with specific restrictions, ensures privacy by prohibiting the correlation of data with personal information, maintains security by restricting unauthorized access and data mining, and outlines the conditions for data accessibility, with no guarantees of its continued availability.
+y?
+● How did you verify the data’s integrity?
+● How does it help you answer your question?
+● Are there any problems with the data
+
+```{r adding libraries}
+library(tidyverse)
+library(dplyr)
+library(readr)
+library(lubridate)
+library(ggplot2)
+```
+
+
+
+```{r load data and merge onto one df}
+temp <- list.files("./Cyclistic_Data", full.names = TRUE, pattern = "\\.csv$")
+
+bike_rides <- readr::read_csv(temp, id = "Bike_Rides_2306_to_2407")
+```
+
+
+
+```{r look into data}
+head(bike_rides)
+```
+
+
+
+```{r column names}
+colnames(bike_rides)
+```
+
+```{r focusing on ride lengths start and stops only}
+start_stop_times <- select(bike_rides,ride_id, member_casual, started_at, ended_at)
+head(start_stop_times)
+```
+
+
+A parameter we want to look at is the ride length which can be calculated using the "started_at" and "ended_at" columns.
+
+
+```{r adding ride length column and day of the week column}
+bike_time_data <- mutate(start_stop_times, ride_lengths = seconds_to_period(ended_at-started_at), day_of_week = weekdays(started_at))
+head(bike_time_data)
+```
+
+
+```{r max ride length}
+max(bike_time_data$ride_lengths)
+```
+
+```{r mean ride length}
+mean(bike_time_data$ride_lengths)
+```
+
+```{r mode day of week}
+mode_char <- function(x) unique(x)[which.max(tabulate(match(x, unique(x))))]
+mode_char(bike_time_data$day_of_week)
+```
+
+```{r average ride length for member and casual riders}
+bike_time_data %>%
+  group_by(member_casual) %>%
+  summarize(avg_ride_length = mean(ride_lengths, na.rm = TRUE))
+```
+
+
+```{r average ride length and number of rides for users by day of week}
+summarized_bike_data <- bike_time_data %>%
+  group_by(day_of_week, member_casual) %>%
+  summarize(avg_ride_length = mean(ride_lengths), 
+            num_rides = n())
+```
+```{r}
+summarized_bike_data$day_of_week <- factor(summarized_bike_data$day_of_week, c("Monday", "Tuesday", "Wednesday", "Thursday","Friday","Saturday", "Sunday"))
+```
+
+
+
+
+```{r}
+head(summarized_bike_data)
+```
+
+```{r visualizing average ride length for users by day of week}
+ggplot(data = summarized_bike_data, aes(x = day_of_week, y = avg_ride_length, fill = member_casual)) +
+  geom_bar(position = "dodge", stat = "identity")
+```
+
+
+
+
+
+```{r visualizing number of rides for users by day of week}
+ggplot(data = summarized_bike_data, aes(x = day_of_week, y = num_rides, fill = member_casual)) +
+  geom_bar(position = "dodge", stat = "identity")
+```
+
+
+
+
+
