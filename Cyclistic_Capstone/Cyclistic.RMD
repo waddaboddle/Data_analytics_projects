@@ -3,7 +3,6 @@ title: "Analysis of Cyclistic's Casual Riders vs Annual Members (In Progress)"
 author: "Muhaimin Ahmed"
 date: "August 28, 2024"
 output: 
-  html_document: default
   github_document: default
 ---
 
