@@ -1,24 +1,25 @@
 ---
-title: "Analysis of Cyclistic's Casual Riders vs Annual Members"
-output: github_document
+title: "Analysis of Cyclistic's Casual Riders vs Annual Members (In Progress)"
+author: "Muhaimin Ahmed"
+date: "August 28, 2024"
+output: 
+  html_document: default
+  github_document: default
 ---
 
-The objective of this analysis is to determine how do annual members and casual riders use Cyclistic bikes differently. This analysis will then be used to determine how to target and convert Casual Riders to Annual Members.
+The objective of this analysis is to determine how annual members and casual riders use Cyclistic bikes differently. This analysis will then be used to determine how to target and convert Casual Riders to Annual Members. Cyclistic is not a real company one used for the purposes of this case study.
 
-The business task at hand is to how do annual members and casual riders use Cyclistic bikes differently?
+The data used for this analysis is located [here](https://divvy-tripdata.s3.amazonaws.com/index.html). It is a practice dataset used to get familiar with data analysis. From the available data the 12 most recent months have been chosen for analysis (August 2023 to August 2024).
 
-The stakeholders are Cyclistic, y. Lily Moreno: The director of mar, nels. ● Cyclistic marketing analy andhieve them. ● Cyclistic .keting program.
+The data is reliable as it is provided by at trusted source (Divvy) and is also current as it includes data from the previous 12 months. The data is also cited by Google ensuring its credibility.
 
+The license agreement addresses licensing by granting a limited license with specific restrictions, ensures privacy by prohibiting the correlation of data with personal information, maintains security by restricting unauthorized access and data mining, and outlines the conditions for data accessibility, with no guarantees of its continued availability.
 
-The Data for this analysis is located under a private Jupyter Notebook server under Cyclistic-Capstone/Data
-The data is organized into 12 csv files each representing one of the 12 most recent months.
-?The data is reliable as it is provided by at trusted source (Divvy). The data is also original as the original data source is given by Divvy. The data is also current as it includes data from the prevoius 12 months. The data is also cited by Google ensuring its credibility. 
+Overall the data was well organized and did not require any cleaning for the objective of this case study.
 
-The Agreement addresses licensing by granting a limited license with specific restrictions, ensures privacy by prohibiting the correlation of data with personal information, maintains security by restricting unauthorized access and data mining, and outlines the conditions for data accessibility, with no guarantees of its continued availability.
-y?
-● How did you verify the data’s integrity?
-● How does it help you answer your question?
-● Are there any problems with the data
+# Libraries
+
+These are the libraries that are used to complete this case study.
 
 ```{r adding libraries}
 library(tidyverse)
@@ -28,93 +29,134 @@ library(lubridate)
 library(ggplot2)
 ```
 
+# Preparing the Data
 
+12 months of data are merged onto one data frame named cyclistic_df.
 
 ```{r load data and merge onto one df}
 temp <- list.files("./Cyclistic_Data", full.names = TRUE, pattern = "\\.csv$")
 
-bike_rides <- readr::read_csv(temp, id = "Bike_Rides_2306_to_2407")
+cyclistic_df <- readr::read_csv(temp, id = "Bike_Rides_2306_to_2407")
 ```
 
-
-
-```{r look into data}
-head(bike_rides)
+```{r overviewing the data}
+str(cyclistic_df)
 ```
 
+Let's focus on the following columns to start the analysis: - ride_id: Ride unique ID. - member_casual: Cyclistic member or casual rider. - started_at and ended_at: Ride start and end times. - rideable_type: Electric, classic or docked bike.
 
-
-```{r column names}
-colnames(bike_rides)
+```{r selecting start and stop times}
+cyclistic_df_v2 <- select(cyclistic_df, ride_id, member_casual, started_at, ended_at, rideable_type)
+head(cyclistic_df_v2)
 ```
 
-```{r focusing on ride lengths start and stops only}
-start_stop_times <- select(bike_rides,ride_id, member_casual, started_at, ended_at)
-head(start_stop_times)
+Using the selected fields the ride length can be calculated and the day of the week can also be determined and store in cyclistic_df_v2.
+
+```{r add ride length and day of the week}
+cyclistic_df_v3 <- mutate(cyclistic_df_v2, 
+                          ride_lengths = seconds_to_period(ended_at-started_at), 
+                          day_of_week = weekdays(started_at), 
+                          month = month.name[month(started_at)])
+head(cyclistic_df_v3)
 ```
 
-
-A parameter we want to look at is the ride length which can be calculated using the "started_at" and "ended_at" columns.
-
-
-```{r adding ride length column and day of the week column}
-bike_time_data <- mutate(start_stop_times, ride_lengths = seconds_to_period(ended_at-started_at), day_of_week = weekdays(started_at))
-head(bike_time_data)
-```
-
+# Analyzing the data
 
 ```{r max ride length}
-max(bike_time_data$ride_lengths)
+max(cyclistic_df_v3$ride_lengths)
 ```
 
 ```{r mean ride length}
-mean(bike_time_data$ride_lengths)
+mean(cyclistic_df_v3$ride_lengths)
 ```
 
-```{r mode day of week}
+```{r mode day of week and  rideable type}
 mode_char <- function(x) unique(x)[which.max(tabulate(match(x, unique(x))))]
-mode_char(bike_time_data$day_of_week)
+mode_char(cyclistic_df_v3$day_of_week)
+mode_char(cyclistic_df_v3$rideable_type)
 ```
 
 ```{r average ride length for member and casual riders}
-bike_time_data %>%
+cyclistic_df_v3 %>%
   group_by(member_casual) %>%
   summarize(avg_ride_length = mean(ride_lengths, na.rm = TRUE))
 ```
 
+```{r distribution of bike types used by member and casual riders}
+
+bike_type_by_member <- cyclistic_df_v3 %>%
+  group_by(member_casual, rideable_type) %>%
+  summarise(count = n()) %>%
+  pivot_wider(names_from = rideable_type, values_from = count, values_fill = 0) %>%
+  gather(key = "bike_type", value = "count", -member_casual)
+head(bike_type_by_member)
+```
+
+```{r}
+ggplot(bike_type_by_member, aes(x = member_casual, y = count, fill = bike_type)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Distribution of Bike Types by Member Type",
+       x = "Member Type",
+       y = "Count",
+       fill = "Bike Type") + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
 
 ```{r average ride length and number of rides for users by day of week}
-summarized_bike_data <- bike_time_data %>%
+summarized_cyclistic_data <- cyclistic_df_v3 %>%
   group_by(day_of_week, member_casual) %>%
   summarize(avg_ride_length = mean(ride_lengths), 
             num_rides = n())
 ```
-```{r}
-summarized_bike_data$day_of_week <- factor(summarized_bike_data$day_of_week, c("Monday", "Tuesday", "Wednesday", "Thursday","Friday","Saturday", "Sunday"))
-```
-
-
-
 
 ```{r}
-head(summarized_bike_data)
+summarized_cyclistic_data$day_of_week <- factor(summarized_cyclistic_data$day_of_week, c("Monday", "Tuesday", "Wednesday", "Thursday","Friday","Saturday", "Sunday"))
 ```
 
-```{r visualizing average ride length for users by day of week}
-ggplot(data = summarized_bike_data, aes(x = day_of_week, y = avg_ride_length, fill = member_casual)) +
-  geom_bar(position = "dodge", stat = "identity")
+```{r}
+head(summarized_cyclistic_data)
 ```
 
-
-
-
-
-```{r visualizing number of rides for users by day of week}
-ggplot(data = summarized_bike_data, aes(x = day_of_week, y = num_rides, fill = member_casual)) +
-  geom_bar(position = "dodge", stat = "identity")
+```{r average ride length for users by day of week}
+ggplot(data = summarized_cyclistic_data, aes(x = day_of_week, y = avg_ride_length, fill = member_casual)) +
+  geom_bar(position = "dodge", stat = "identity") +
+  labs(title = "Average Ride Length for Users by Day of the Week",
+       x = "Day of the week",
+       y = "Average Ride Length",
+       fill = "User Type") + 
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 
+```{r number of rides for users by day of week}
+ggplot(data = summarized_cyclistic_data, aes(x = day_of_week, y = num_rides, fill = member_casual)) +
+  geom_bar(position = "dodge", stat = "identity") +
+  labs(title = "Number of Rides for Users by Day of the Week",
+       x = "Day of the week",
+       y = "Number of Rides",
+       fill = "User Type") + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r monthly summary}
+monthly_cyclistic_data <- cyclistic_df_v3 %>%
+  group_by(month, member_casual) %>%
+  summarize(avg_ride_length = mean(ride_lengths), 
+            num_rides = n())
+
+head(monthly_cyclistic_data)
+```
+
+```{r number of rides for users by month}
+monthly_cyclistic_data <- monthly_cyclistic_data %>%
+  mutate(month = factor(month, levels = month.name, ordered = TRUE))
 
 
-
-
+ggplot(data = monthly_cyclistic_data, aes(x = month, y = num_rides, fill = member_casual)) +
+  geom_bar(position = "dodge", stat = "identity") +
+  labs(title = "Number of Rides for Users by Month",
+       x = "Month",
+       y = "Number of Rides",
+       fill = "User Type") + 
+  theme(plot.title = element_text(hjust = 0.5), 
+        axis.text.x = element_text(angle = 45, size = 8))
+```
