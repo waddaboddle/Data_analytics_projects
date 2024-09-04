@@ -1,9 +1,14 @@
-Analysis of Cyclistic’s Casual Riders vs Annual Members (In Progress)
+Analysis of Cyclistic’s Casual Riders vs Annual Members
 ================
 Muhaimin Ahmed
 August 28, 2024
 
 # Introduction
+
+This is a CAPSTONE case study I did as part of my Google Data Analytics
+Certification. In this case study, I work for a fictional company,
+Cyclistic and have to answer business questions from my manager Lily
+Moreno.
 
 ## About Cyclistic
 
@@ -17,10 +22,13 @@ annual members.
 
 ## Guiding Questions
 
-The questions guiding this analysis are the following: 1. How do annual
-members and casual riders use Cyclistic bikes differently? 2. Why would
-casual riders buy Cyclistic annual memberships? 3. How can Cyclistic use
-digital media to influence casual riders to become members?
+The questions guiding this analysis are the following:
+
+1.  How do annual members and casual riders use Cyclistic bikes
+    differently?
+2.  Why would casual riders buy Cyclistic annual memberships?
+3.  How can Cyclistic use digital media to influence casual riders to
+    become members?
 
 ## Location of the Data
 
@@ -337,6 +345,15 @@ head(monthly_cyclistic_data)
     ## 5 Aug-23     casual                   29.4    311130
     ## 6 Aug-23     member                   29.4    460563
 
+I was also curious to see the number of rides throughout a year. And
+unsurprisingly there are more rides in the warmer months than there are
+in the colder months. Casual riders drop off much more than the member
+users. Once again it comes back to the difference in the reason why the
+two types of users use the service. Casual users use it for leisure so
+they can afford not biking as much in the colder months, however more
+member users may use this service for commute to work which can be why
+their numbers don’t drop as low.
+
 ``` r
 ggplot(data = monthly_cyclistic_data, aes(x = month_year, y = num_rides, fill = member_casual)) +
   geom_bar(position = "dodge", stat = "identity") +
@@ -350,11 +367,151 @@ ggplot(data = monthly_cyclistic_data, aes(x = month_year, y = num_rides, fill = 
 
 ![](Cyclistic_files/figure-gfm/number%20of%20rides%20for%20users%20by%20month-1.png)<!-- -->
 
-I was also curious to see the number of rides throughout a year. And
-unsurprisingly there are more rides in the warmer months than there are
-in the colder months. Casual riders drop off much more than the member
-users. Once again it comes back to the difference in the reason why the
-two types of users use the service. Casual users use it for leisure so
-they can afford not biking as much in the colder months, however more
-member users may use this service for commute to work which can be why
-their numbers don’t drop as low.
+# Conclusion
+
+We can now use our analysis to answer the aforementioned guiding
+questions.
+
+## Difference between annual and casual riders.
+
+According to the data, more annual members ride during the week than the
+weekend. This may mean that annual members use Cyclistic to commute to
+work during the week which is why they are less likely to use it during
+the weekend. On the other hand, more casual riders use Cyclistic during
+the weekend. This hints at casual riders using Cyclistic for leisurely
+purposes during their time off in the weekend.
+
+## Reasons to switch to an annual membership for the casual rider.
+
+Casual riders may consider purchasing Cyclistic annual memberships for
+several reasons:
+
+1.  Cost Savings: If a casual rider finds themselves using Cyclistic
+    more frequently over time, they might realize that the cost of
+    individual rides adds up. An annual membership could be more
+    cost-effective if they plan to use the service regularly, even if
+    primarily on weekends.
+
+2.  Flexibility and Convenience: An annual membership offers the
+    flexibility to ride anytime without worrying about the cost of each
+    trip. For riders who value convenience and spontaneity, an annual
+    membership removes the hassle of repeatedly purchasing single rides.
+
+3.  Increased Usage Over Time: Casual riders who initially use Cyclistic
+    for leisurely weekend rides might develop a habit or enjoy the
+    experience enough to start using it more frequently, perhaps even
+    incorporating it into their weekly routine. An annual membership
+    could be a logical step as their usage increases.
+
+4.  Commitment to a Healthier Lifestyle: Some casual riders might see an
+    annual membership as a commitment to a healthier, more active
+    lifestyle. Regular biking, even if only on weekends, can be part of
+    a fitness routine or a way to explore the city.
+
+5.  Special Promotions or Incentives: Cyclistic might offer promotions,
+    discounts, or added benefits that make an annual membership more
+    appealing to casual riders. For example, discounts on annual
+    memberships during certain times of the year could encourage casual
+    riders to commit.
+
+6.  Supporting a Green Initiative: Riders who are environmentally
+    conscious might choose to buy an annual membership as a way of
+    supporting sustainable transportation options, even if their usage
+    is primarily for leisure.
+
+7.  Peer Influence: If a rider’s friends or family members have annual
+    memberships, they might be encouraged to get one themselves to join
+    group rides or participate in shared activities.
+
+These factors can make the annual membership appealing to casual riders,
+even if their primary usage remains centered around the weekend.
+
+## Recomendation to incentivize casual to member rider conversion.
+
+Cyclistic can leverage digital media to influence casual riders to
+become members through several strategic approaches:
+
+1.  Targeted Advertising:
+
+- Social Media Ads: Use platforms like Instagram, Facebook, and Twitter
+  to run targeted ads that highlight the benefits of an annual
+  membership. These ads can be customized based on user behavior, such
+  as those who have previously rented bikes or visited the Cyclistic
+  website.
+- Google Ads: Implement search and display ads targeting keywords like
+  “bike rental,” “weekend activities,” or “leisure biking.” These ads
+  can direct users to landing pages that explain the advantages of a
+  membership.
+
+2.  Email Marketing:
+
+- Personalized Offers: Send personalized emails to casual riders with
+  exclusive discounts or promotions for upgrading to an annual
+  membership. Emails can include usage statistics showing how much they
+  could save with a membership.
+- Usage-Based Recommendations: Based on data, email casual riders after
+  a certain number of trips, highlighting how close they are to the cost
+  of an annual membership and offering a discount to close the gap.
+
+3.  Engaging Content:
+
+- Blogs and Articles: Create blog posts or articles on the Cyclistic
+  website discussing topics like “Top 10 Weekend Biking Trails,” subtly
+  promoting how an annual membership can enhance these experiences.
+- Social Media Content: Share success stories or testimonials from
+  casual riders who upgraded to an annual membership, emphasizing the
+  benefits they’ve experienced, like cost savings or improved health.
+- Video Content: Produce short, engaging videos for platforms like
+  YouTube or TikTok, showcasing real-life scenarios where casual riders
+  benefit from an annual membership, such as commuting to work, weekend
+  outings, or spontaneous rides.
+
+4.  Referral Programs:
+
+- Incentivized Referrals: Launch a referral program where current
+  members can invite casual riders to join with a discount on their
+  first annual membership. Reward both the referrer and the new member
+  with additional ride credits or discounts.
+
+5.  Social Proof and Influencer Partnerships:
+
+- Testimonials and Reviews: Encourage satisfied members to share their
+  experiences on review sites, social media, or through testimonials
+  featured on the Cyclistic website.
+- Influencer Collaborations: Partner with local influencers who align
+  with the brand’s values (e.g., fitness enthusiasts, eco-friendly
+  advocates) to promote the annual membership through their platforms,
+  providing them with free memberships or other incentives.
+
+6.  Interactive Campaigns and Challenges:
+
+- Biking Challenges: Create digital challenges that encourage casual
+  riders to track their rides through an app, offering rewards for
+  milestones that could be best utilized with an annual membership.
+- Gamification: Incorporate gamification elements in an app where users
+  earn points or badges for rides taken, with rewards or discounts on
+  annual memberships once certain thresholds are met.
+
+7.  Retargeting Strategies:
+
+- Website Retargeting: Use cookies to track casual riders who have
+  visited the Cyclistic website or app but haven’t purchased a
+  membership. Serve them retargeted ads on other websites and social
+  media platforms, emphasizing the benefits of an annual membership.
+- Abandoned Cart Emails: If Cyclistic offers online membership
+  purchases, send automated emails to users who begin the membership
+  purchase process but do not complete it, reminding them of the
+  benefits and offering a limited-time discount.
+
+8.  Exclusive Member Content:
+
+- Webinars and Virtual Events: Host webinars or virtual events
+  discussing the best biking routes, maintenance tips, or health
+  benefits of biking, offering special content or early access to
+  members. Promote these events to casual riders to entice them to join
+  for exclusive access.
+
+By using these digital media strategies, Cyclistic can create a
+compelling narrative and offer tangible incentives for casual riders to
+transition to annual memberships, ultimately fostering greater brand
+loyalty and increased revenue.
